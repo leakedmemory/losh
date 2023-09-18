@@ -1,0 +1,9 @@
+.vscode/
+.idea/
+
+obj/
+losh
+tests/main
+
+*.gcda
+*.gcno
