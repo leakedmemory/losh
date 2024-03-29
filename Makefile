@@ -1,5 +1,5 @@
 # bin variables
-CC := clang
+CC := gcc
 CFLAGS := -std=c17 -Wall -Wextra
 RELEASE ?= 0
 ifeq ($(RELEASE), 0)
@@ -27,7 +27,7 @@ endif
 BIN := losh
 
 # tests variables
-CXX := clang++
+CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -O2
 CXXLDFLAGS := -lgtest
 
@@ -43,7 +43,7 @@ TESTS_OBJ := $(patsubst $(TESTS_DIR)/%.cc, $(TESTS_OBJ_DIR)/%.o, $(TESTS))
 TESTS_BIN := $(TESTS_BIN_DIR)/main
 
 # general targets
-.PHONY: all run test clean format
+.PHONY: all run test clean
 
 ifeq ($(RELEASE), 0)
 all: debug
@@ -59,9 +59,6 @@ endif
 
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR) $(TESTS_OBJ_DIR) $(TESTS_BIN_DIR)
-
-format:
-	@clang-format $(SRC_DIR)/*.c $(TESTS_DIR)/*.cc -style=file -i
 
 # debug compilation
 .PHONY: debug
