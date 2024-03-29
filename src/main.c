@@ -1,13 +1,13 @@
-#include "builtins.h"
-#include "cmd_parser.h"
-#include "env.h"
-#include "exec_cmd.h"
-
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "builtins.h"
+#include "cmd_parser.h"
+#include "env.h"
+#include "exec_cmd.h"
 
 #define INPUT_SIZE (size_t)4096
 
@@ -20,7 +20,7 @@ int main(void) {
     init_cmd(&cmd);
     bool run = true;
     while (run) {
-        printf("losh$ "); // temporary while a proper prompt doesn't exist
+        printf("losh$ ");  // temporary while a proper prompt doesn't exist
         fflush(stdout);
 
         char *fgets_result = fgets(input, INPUT_SIZE, stdin);

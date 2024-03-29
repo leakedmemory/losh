@@ -3,11 +3,11 @@
 
 #include "find_cmd.h"
 
-#include "lib.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+
+#include "lib.h"
 
 char *join_paths(const char *root, const char *relative) {
     size_t length = strlen(root) + 1 + strlen(relative) + 1;

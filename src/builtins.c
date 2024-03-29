@@ -3,13 +3,13 @@
 
 #include "builtins.h"
 
-#include "find_cmd.h"
-#include "lib.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "find_cmd.h"
+#include "lib.h"
 
 // must be the amount of builtin commands
 #define BUILTINS_AMOUNT 6
@@ -24,9 +24,7 @@ static int32_t which(char **args);
 
 // macro for easier node creation
 #define NODE(name, handler, min_args, max_args, next) \
-    { \
-        name, { handler, min_args, max_args }, next \
-    }
+    { name, {handler, min_args, max_args}, next }
 
 typedef struct hash_node {
     const char *key;
@@ -39,13 +37,13 @@ static size_t hash(const char *str) {
     int32_t c;
 
     while ((c = *(unsigned char *)str++)) {
-        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+        hash = ((hash << 5) + hash) + c;  // hash * 33 + c
     }
 
     return hash % BUILTINS_AMOUNT;
 }
 
-static HashNode *builtins_hashtable[BUILTINS_AMOUNT] = { NULL };
+static HashNode *builtins_hashtable[BUILTINS_AMOUNT] = {NULL};
 
 static void insert_node(HashNode *node) {
     size_t index = hash(node->key);
@@ -66,8 +64,7 @@ void init_builtins(void) {
     HashNode nodes[BUILTINS_AMOUNT] = {
         NODE("cd", cd, 0, 1, NULL),        NODE("exit", builtin_exit, 0, 0, NULL),
         NODE("echo", echo, 0, -1, NULL),   NODE("pwd", pwd, 0, 0, NULL),
-        NODE("where", where, 0, -1, NULL), NODE("which", which, 0, -1, NULL)
-    };
+        NODE("where", where, 0, -1, NULL), NODE("which", which, 0, -1, NULL)};
 
     for (size_t i = 0; i < BUILTINS_AMOUNT; i++) {
         insert_node(&nodes[i]);
@@ -148,9 +145,7 @@ static int32_t pwd(char **args) {
     return status;
 }
 
-static bool is_builtin(const char *cmd) {
-    return get_builtin(cmd) != NULL;
-}
+static bool is_builtin(const char *cmd) { return get_builtin(cmd) != NULL; }
 
 static int32_t where(char **args) {
     int32_t status = 0;
