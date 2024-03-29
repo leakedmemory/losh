@@ -10,9 +10,8 @@ preprocessor condition to determine which code has to be compiled.
 
 That been said, make sure to have installed the following dependencies:
 
-- GNU Make
-- Clang
-- Clang++
+- [GNU Make](https://www.gnu.org/software/make/)
+- [gcc](https://gcc.gnu.org/)
 
 You can try changing the compiler in the [Makefile](Makefile) to something that
 you prefer, but it is NOT garanteed that it will work by only doing the this,
@@ -21,8 +20,8 @@ and maybe you will have to change other things aswell.
 Finally, to compile the code you use the following commands:
 
 ```bash
-make      # to build
-make run  # to build and run
+$ make      # to build
+$ make run  # to build and run
 ```
 
 The binary output, by default, is the debug version. You can change the binary
@@ -30,8 +29,8 @@ to the release version by using the previous commands and adding `RELEASE=1`
 to it:
 
 ```bash
-RELEASE=1 make  # or
-make run RELEASE=1
+$ RELEASE=1 make      # or
+$ make run RELEASE=1
 ```
 
 ## Developing
@@ -53,23 +52,6 @@ the project, been only a simple mechanism, in this project, to make the LSP
 recognize those paths, and a simpler version of `compile_commands.json` and
 `.clangd` [config file](https://clangd.llvm.org/config.html).
 
-### Usefull Commands
-
-During the development, maybe you will want/need to do some of these things:
-
-- Delete every compiled file to build everything from the ground up
-
-```bash
-make clean
-```
-
-- Format the code if your editor cannot format it automatically using the rules
-set in the [.clang-format](.clang-format) file
-
-```bash
-make format
-```
-
 ## Testing
 
 Unfortunately, to run the tests of this project, it is necessary to have
@@ -85,8 +67,8 @@ To run the tests, use the command below. Make sure to use the `RELEASE=1` flag,
 otherwise it will NOT compile.
 
 ```bash
-RELEASE=1 make test  # or
-make test RELEASE=1
+$ RELEASE=1 make test  # or
+$ make test RELEASE=1
 ```
 
 ## What have I learned with this?
