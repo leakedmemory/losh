@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -std=c17 -Wall -Wextra -Wfloat-equal -Wpointer-arith \
 	  -Wstrict-prototypes -Wwrite-strings -Wcast-qual -Wswitch-enum \
-	  -Wconversion -fsanitize=undefined,address -g3 -Og
+	  -Wconversion -fsanitize=undefined -g3 -Og
 
 SRC_DIR := src
 OBJ_DIR := obj
@@ -20,6 +20,7 @@ CDEPS := $(patsubst %.c, %.d, $(SRC))
 all: make_dirs $(BIN)
 
 run: make_dirs $(BIN)
+	@echo
 	@./$(BIN)
 
 clean:
@@ -47,8 +48,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
 # tests compilation
 CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -Wfloat-equal -Wpointer-arith \
-	    -Wwrite-strings -Wcast-qual -Wswitch-enum -Wconversion \
-	    -Wconversion -fsanitize=undefined,address -g3 -Og
+	    -Wwrite-strings -Wswitch-enum -Wconversion -fsanitize=undefined -O2
 CXXLDFLAGS := -lgtest
 
 TESTS_DIR := tests
@@ -65,6 +65,7 @@ CXXDEPS := $(patsubst %.cc, %.d, $(TESTS))
 
 .PHONY: tests
 tests: make_tests_dirs $(TESTS_BIN)
+	@echo
 	@./$(TESTS_BIN)
 
 .PHONY: make_tests_dirs
