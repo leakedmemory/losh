@@ -1,7 +1,27 @@
-#include <stdio.h>
+#include "io_handler.h"
+
+#define INPUT_SIZE 4096
 
 int main(void) {
-    printf("Hello Wold\n");
+    char input[INPUT_SIZE];
+    io_alloc_cfg_singleton(stdout, stdin, stderr);
 
-    return 0;
+    while (1) {
+        io_write("losh$ ");
+        io_flush_out_stream();
+
+        if (io_read(input, INPUT_SIZE) < 0) {
+            io_perror("ERROR: Input reading failed");
+            if (io_input_was_too_big()) {
+                io_clean_input_stream();
+            }
+            continue;
+        }
+
+        if (input[0] == '\n') {
+            continue;
+        }
+
+        // TODO: parse input
+    }
 }
