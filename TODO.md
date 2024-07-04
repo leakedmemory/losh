@@ -1,7 +1,7 @@
-# TODO list
+# TODO List
 
 - [x] **Get User Input**
-- [ ] **Parse User Input**
+- [x] **Parse User Input**
 - [ ] **Execute Commands**
 - [ ] **Built-in Commands**
 - [ ] **IO Redirection**

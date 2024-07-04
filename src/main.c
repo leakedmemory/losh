@@ -1,3 +1,4 @@
+#include "cmd_parser.h"
 #include "io_handler.h"
 
 #define INPUT_SIZE 4096
@@ -5,6 +6,8 @@
 int main(void) {
     char input[INPUT_SIZE];
     io_alloc_cfg_singleton(stdout, stdin, stderr);
+    Command cmd;
+    cmd_init(&cmd);
 
     while (1) {
         io_write("losh$ ");
@@ -19,6 +22,11 @@ int main(void) {
             continue;
         }
 
-        // TODO: parse input
+        if (cmd_parse_input(&cmd, input) == 0) {
+            // TODO: execute command
+            cmd_clean(&cmd);
+        } else {
+            io_perror("Input parsing failed");
+        }
     }
 }
