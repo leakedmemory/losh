@@ -12,9 +12,6 @@ int main(void) {
 
         if (io_read(input, INPUT_SIZE) < 0) {
             io_perror("ERROR: Input reading failed");
-            if (io_input_was_too_big()) {
-                io_clean_input_stream();
-            }
             continue;
         }
 

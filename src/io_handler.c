@@ -1,50 +1,15 @@
 #include "io_handler.h"
 
-#include <errno.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
 
+#include "error.h"
+
 static IOConfig *_io_cfg = NULL;
-static IOErrorCode _io_error_code = IO_SUCCESS;
-
-IOErrorCode io_get_error_code(void) { return _io_error_code; }
-
-const char *io_get_error_msg(IOErrorCode code) {
-    switch (code) {
-        case IO_SUCCESS:
-            return "Success";
-        case IO_CFG_NOT_INITIALIZED:
-            return "IOConfig not initialized";
-        case IO_CFG_ALREADY_INITIALIZED:
-            return "IOConfig already initialized";
-        case IO_INPUT_TOO_BIG:
-            return "Input size was too big";
-        case IO_SYSTEM_ERROR:
-            return strerror(errno);
-        default:  // should be unreachable and it's only here for completion
-            return "Unknown error";
-    }
-}
-
-void io_perror(const char *msg) {
-    const char *err_msg = io_get_error_msg(_io_error_code);
-    switch (_io_error_code) {
-        case IO_SUCCESS:
-        case IO_CFG_ALREADY_INITIALIZED:
-        case IO_INPUT_TOO_BIG:
-        case IO_SYSTEM_ERROR:
-            io_write_err("%s: %s\n", msg, err_msg);
-            break;
-        case IO_CFG_NOT_INITIALIZED:
-            fprintf(stderr, "%s: %s\n", msg, err_msg);
-            break;
-    }
-
-    _io_error_code = IO_SUCCESS;
-}
 
 typedef struct IOConfig {
     FILE *out;
@@ -56,106 +21,109 @@ void io_alloc_cfg_singleton(FILE *out, FILE *in, FILE *err) {
     if (_io_cfg == NULL) {
         _io_cfg = malloc(sizeof(IOConfig));
         if (_io_cfg == NULL) {
-            fprintf(stderr, "ERROR: IOConfig allocation failed\n");
+            // probably not the best way of handling it, since it's a core point
+            // of the program and probably it would be better to take some tries
+            // before exiting, but w/e
+            perror("ERROR: IOConfig allocation failed");
             exit(EX_OSERR);
         }
         _io_cfg->out = out == NULL ? stdout : out;
         _io_cfg->in = in == NULL ? stdin : in;
         _io_cfg->err = err == NULL ? stderr : err;
     } else {
-        _io_error_code = IO_CFG_ALREADY_INITIALIZED;
+        set_error_code(IO_CFG_ALREADY_INITIALIZED);
     }
 }
 
 void io_free_cfg_singleton(void) {
     free(_io_cfg);
     _io_cfg = NULL;
-    _io_error_code = IO_SUCCESS;
+    set_error_code(SUCCESS);
 }
 
-const IOConfig *io_get_cfg_instance(void) {
-    if (_io_cfg == NULL) {
-        _io_error_code = IO_CFG_NOT_INITIALIZED;
-        return NULL;
-    }
-    return _io_cfg;
+const IOConfig *io_get_cfg_instance(void) { return _io_cfg; }
+
+const FILE *io_get_out_stream(void) { return _io_cfg->out; }
+
+const FILE *io_get_in_stream(void) { return _io_cfg->in; }
+
+const FILE *io_get_err_stream(void) { return _io_cfg->err; }
+
+static void _clean_input_stream(void) {
+    int c;
+    while ((c = getc(_io_cfg->in)) != '\n' && c != EOF);
 }
 
 int32_t io_read(char *buf, size_t size) {
-    if (_io_cfg == NULL) {
-        _io_error_code = IO_CFG_NOT_INITIALIZED;
-        return -1;
-    }
-
     char *read_result = fgets(buf, (int32_t)size, _io_cfg->in);
     if (read_result == NULL) {
-        _io_error_code = IO_SYSTEM_ERROR;
+        if (ferror(_io_cfg->in)) {
+            clearerr(_io_cfg->in);
+        }
+        set_error_code(SYSTEM_ERROR);
         return -1;
     }
 
     bool input_was_too_big = strlen(buf) == size - 1 && buf[size - 2] != '\n';
     if (input_was_too_big) {
-        _io_error_code = IO_INPUT_TOO_BIG;
+        _clean_input_stream();
+        set_error_code(IO_INPUT_TOO_BIG);
         return -1;
     }
 
-    _io_error_code = IO_SUCCESS;
+    set_error_code(SUCCESS);
 
     return (int32_t)strlen(buf);
 }
 
 int32_t io_write(const char *fmt, ...) {
-    if (_io_cfg == NULL) {
-        _io_error_code = IO_CFG_NOT_INITIALIZED;
-        return -1;
-    }
-
     va_list args;
     va_start(args, fmt);
     int32_t chars_written = vfprintf(_io_cfg->out, fmt, args);
     va_end(args);
 
-    _io_error_code = IO_SUCCESS;
+    set_error_code(SUCCESS);
 
     return chars_written;
 }
 
 int32_t io_write_err(const char *fmt, ...) {
-    if (_io_cfg == NULL) {
-        _io_error_code = IO_CFG_NOT_INITIALIZED;
-        return -1;
-    }
-
     va_list args;
     va_start(args, fmt);
     int32_t chars_written = vfprintf(_io_cfg->err, fmt, args);
     va_end(args);
 
-    _io_error_code = IO_SUCCESS;
+    set_error_code(SUCCESS);
 
     return chars_written;
 }
 
 int32_t io_flush_out_stream(void) {
     int32_t result = fflush(_io_cfg->out);
-    _io_error_code = result == 0 ? IO_SUCCESS : IO_SYSTEM_ERROR;
+    set_error_code(result == 0 ? SUCCESS : SYSTEM_ERROR);
     return result;
 }
 
 int32_t io_flush_err_stream(void) {
     int32_t result = fflush(_io_cfg->err);
-    _io_error_code = result == 0 ? IO_SUCCESS : IO_SYSTEM_ERROR;
+    set_error_code(result == 0 ? SUCCESS : SYSTEM_ERROR);
     return result;
 }
 
-inline bool io_input_was_too_big(void) { return _io_error_code == IO_INPUT_TOO_BIG; }
-
-void io_clean_input_stream(void) {
-    if (_io_cfg == NULL) {
-        _io_error_code = IO_CFG_NOT_INITIALIZED;
-        return;
+void io_perror(const char *msg) {
+    const char *err_msg = get_current_error_msg();
+    switch (get_error_code()) {
+        case SUCCESS:
+            io_write_err("%s: %s\n", msg, err_msg);
+            break;
+        case IO_INPUT_TOO_BIG:
+        case SYSTEM_ERROR:
+            io_write_err("ERROR: %s: %s\n", msg, err_msg);
+            break;
+        case IO_CFG_ALREADY_INITIALIZED:
+            io_write_err("WARNING: %s: %s\n", msg, err_msg);
+            break;
     }
 
-    int c;
-    while ((c = getc(_io_cfg->in)) != '\n' && c != EOF);
+    set_error_code(SUCCESS);
 }
