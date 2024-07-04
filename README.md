@@ -20,6 +20,13 @@ $ make      # to build
 $ make run  # to build and run
 ```
 
+Also, to remove the files created, you can use:
+
+```bash
+$ make clean      # to remove the `.o`, `.d` and binary files
+$ make clean_all  # to also remove them for the tests files
+```
+
 ## Developing
 
 ### File Structure
@@ -43,14 +50,13 @@ installed on the machine the [GoogleTest](https://github.com/google/googletest)
 framework, since it is not downloaded on the fly when trying to run the tests
 for the first time. I know that [this is NOT the correct way of using it](
 https://github.com/google/googletest/blob/36066cfecf79267bdf46ff82ca6c3b052f8f633c/googletest/docs/faq.md#why-is-it-not-recommended-to-install-a-pre-compiled-copy-of-google-test-for-example-into-usrlocal),
-but this is just for learning anyway.
+and can lead into undefined behavior, but this is just for learning anyway.
 
 Since the GoogleTest framework is written in C++, the test files also happen
-to be C++ files, but of course calling the source code in C ([FFI](
+to be C++ files, but calling the C code ([FFI](
 https://en.wikipedia.org/wiki/Foreign_function_interface)).
 
-To run the tests, use the command below and make sure the object files for
-testing are already compiled, otherwise the tests will fail.
+To run the tests, use the command below:
 
 ```bash
 make tests
@@ -59,11 +65,12 @@ make tests
 ## What have I learned with this?
 
 - C properties
-- How to create a makefile in projects with more than just a couple of files
+- How to create a Makefile in projects with more than just a couple of files
 - How to use GDB
 - How to create and use clang-format
 - How to make syscalls directly from C
 - Pipes and communication between processes
-- I/O redirection
+- IO redirection
 - Tests in C
 - Input parsing
+- Basic FFI use

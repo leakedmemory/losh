@@ -64,7 +64,7 @@ TESTS_BIN := $(TESTS_DIR)/main
 CXXDEPS := $(patsubst %.cc, %.d, $(TESTS))
 
 .PHONY: tests
-tests: make_tests_dirs $(TESTS_BIN)
+tests: make_dirs $(OBJ) make_tests_dirs $(TESTS_BIN)
 	@echo
 	@./$(TESTS_BIN)
 
