@@ -1,11 +1,14 @@
 #include "cmd_parser.h"
+#include "env.h"
 #include "io_handler.h"
 
 #define INPUT_SIZE 4096
 
 int main(void) {
-    char input[INPUT_SIZE];
+    env_init();
     io_alloc_cfg_singleton(stdout, stdin, stderr);
+
+    char input[INPUT_SIZE];
     Command cmd;
     cmd_init(&cmd);
 
@@ -29,4 +32,8 @@ int main(void) {
             io_perror("Input parsing failed");
         }
     }
+
+    // not reachable for now
+    env_restore();
+    return 0;
 }
