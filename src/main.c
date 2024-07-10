@@ -7,7 +7,7 @@
 
 int main(void) {
     env_init();
-    io_alloc_cfg_singleton(stdout, stdin, stderr);
+    io_alloc_cfg_singleton(stdin, stdout, stderr);
 
     char input[INPUT_SIZE];
     Command cmd;
@@ -18,7 +18,7 @@ int main(void) {
         io_flush_out_stream();
 
         if (io_read(input, INPUT_SIZE) < 0) {
-            io_perror("ERROR: Input reading failed");
+            io_perror("Input reading failed");
             continue;
         }
 

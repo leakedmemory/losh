@@ -5,7 +5,7 @@
 
 typedef struct IOConfig IOConfig;
 
-void io_alloc_cfg_singleton(FILE *out, FILE *in, FILE *err);
+void io_alloc_cfg_singleton(FILE *in, FILE *out, FILE *err);
 void io_free_cfg_singleton(void);
 const IOConfig *io_get_cfg_instance(void);
 const FILE *io_get_out_stream(void);

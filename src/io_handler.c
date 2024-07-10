@@ -12,12 +12,12 @@
 static IOConfig *_io_cfg = NULL;
 
 typedef struct IOConfig {
-    FILE *out;
     FILE *in;
+    FILE *out;
     FILE *err;
 } IOConfig;
 
-void io_alloc_cfg_singleton(FILE *out, FILE *in, FILE *err) {
+void io_alloc_cfg_singleton(FILE *in, FILE *out, FILE *err) {
     if (_io_cfg == NULL) {
         _io_cfg = malloc(sizeof(IOConfig));
         if (_io_cfg == NULL) {
@@ -27,8 +27,8 @@ void io_alloc_cfg_singleton(FILE *out, FILE *in, FILE *err) {
             perror("ERROR: IOConfig allocation failed");
             exit(EX_OSERR);
         }
-        _io_cfg->out = out == NULL ? stdout : out;
         _io_cfg->in = in == NULL ? stdin : in;
+        _io_cfg->out = out == NULL ? stdout : out;
         _io_cfg->err = err == NULL ? stderr : err;
         set_error_code(SUCCESS);
     } else {
@@ -44,9 +44,9 @@ void io_free_cfg_singleton(void) {
 
 const IOConfig *io_get_cfg_instance(void) { return _io_cfg; }
 
-const FILE *io_get_out_stream(void) { return _io_cfg->out; }
-
 const FILE *io_get_in_stream(void) { return _io_cfg->in; }
+
+const FILE *io_get_out_stream(void) { return _io_cfg->out; }
 
 const FILE *io_get_err_stream(void) { return _io_cfg->err; }
 
