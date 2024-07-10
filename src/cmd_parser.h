@@ -16,4 +16,4 @@ void cmd_clean(Command *cmd);
 int8_t cmd_parse_input(Command *cmd, char *input);
 
 const char *cmd_get_mnemonic(Command *cmd);
-const char *const *cmd_get_args(Command *cmd);
+char *const *cmd_get_args(Command *cmd);

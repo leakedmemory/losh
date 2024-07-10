@@ -1,3 +1,4 @@
+#include "cmd_exec.h"
 #include "cmd_parser.h"
 #include "env.h"
 #include "io_handler.h"
@@ -26,14 +27,10 @@ int main(void) {
         }
 
         if (cmd_parse_input(&cmd, input) == 0) {
-            // TODO: execute command
+            cmd_exec(&cmd);
             cmd_clean(&cmd);
         } else {
             io_perror("Input parsing failed");
         }
     }
-
-    // not reachable for now
-    env_restore();
-    return 0;
 }

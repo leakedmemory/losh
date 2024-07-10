@@ -17,11 +17,14 @@ const char *get_error_msg(ErrorCode code) {
             return "IOConfig already initialized";
         case IO_INPUT_TOO_BIG:
             return "Input size was too big";
+        case CMD_NOT_FOUND:
+            return "Command not found";
         case SYSTEM_ERROR:
             return strerror(errno);
-        default:  // should be unreachable and it's only here for completion
-            return "Unknown error";
     }
+
+    // should be unreachable and it's only here for completion
+    return "Unknown error";
 }
 
 const char *get_current_error_msg(void) { return get_error_msg(_error_code); }

@@ -97,4 +97,4 @@ int8_t cmd_parse_input(Command *cmd, char *input) {
 
 const char *cmd_get_mnemonic(Command *cmd) { return cmd->_args[0]; }
 
-const char *const *cmd_get_args(Command *cmd) { return (const char *const *)cmd->_args; }
+char *const *cmd_get_args(Command *cmd) { return cmd->_args; }

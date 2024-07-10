@@ -30,6 +30,7 @@ void io_alloc_cfg_singleton(FILE *out, FILE *in, FILE *err) {
         _io_cfg->out = out == NULL ? stdout : out;
         _io_cfg->in = in == NULL ? stdin : in;
         _io_cfg->err = err == NULL ? stderr : err;
+        set_error_code(SUCCESS);
     } else {
         set_error_code(IO_CFG_ALREADY_INITIALIZED);
     }
@@ -122,6 +123,9 @@ void io_perror(const char *msg) {
             break;
         case IO_CFG_ALREADY_INITIALIZED:
             io_write_err("WARNING: %s: %s\n", msg, err_msg);
+            break;
+        case CMD_NOT_FOUND:
+            io_write_err("losh: %s: %s\n", err_msg, msg);
             break;
     }
 

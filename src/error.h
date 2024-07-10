@@ -4,6 +4,7 @@ typedef enum {
     SUCCESS,
     IO_CFG_ALREADY_INITIALIZED,
     IO_INPUT_TOO_BIG,
+    CMD_NOT_FOUND,
     SYSTEM_ERROR,
 } ErrorCode;
 
