@@ -4,11 +4,11 @@ A simple shell for learning purposes.
 
 ## Building from Source
 
-It is important to say that this project can only be compiled in a linux
-enviroment, since it uses the linux syscalls direcly, instead of having a
-preprocessor condition to determine which code has to be compiled.
+This project can only be compiled on a Linux environment, as it uses Linux
+syscalls directly without preprocessor conditions to determine platform-specific
+code.
 
-That been said, make sure to have installed the following dependencies:
+Ensure you have the following dependencies installed:
 
 - [GNU Make](https://www.gnu.org/software/make/)
 - [gcc](https://gcc.gnu.org/)
@@ -20,57 +20,54 @@ $ make      # to build
 $ make run  # to build and run
 ```
 
-Also, to remove the files created, you can use:
+To remove generated files, use:
 
 ```bash
-$ make clean      # to remove the `.o`, `.d` and binary files
-$ make clean_all  # to also remove them for the tests files
+$ make clean      # to remove the `.o`, `.d`, and binary files
+$ make clean_all  # to remove these files from both the main application and the tests
 ```
 
 ## Developing
 
 ### File Structure
 
-Within the `src` directory is where the source code is located. When you
-compile the code, a directory will be created on the root directory: `obj`.
-It will contain the compiled objects and dependencies files.
+- `src/`: Contains the source code.
+- `obj/`: Created during compilation, contains compiled objects and
+  dependencies.
+- `tests/`: Contains the project's test files, with a similar structure to the
+  main source code.
+- `compile_flags.txt`: Specifies include paths for the project to help the LSP
+  in recognizing those paths, acting as a simpler version of
+  `compile_commands.json` and the
+  [`.clangd` config file](https://clangd.llvm.org/config.html).
 
-In the `tests` directory are located the tests from the project. It's similarly
-to the proccess described before, but with the root directory for it being `tests`.
+### Testing
 
-Lastly, the `compile_flags.txt` file is destinated to put the include paths of
-the project, been only a simple mechanism, in this project, to make the LSP
-recognize those paths, and a simpler version of `compile_commands.json` and
-`.clangd` [config file](https://clangd.llvm.org/config.html).
+This project uses the [GoogleTest](https://github.com/google/googletest)
+framework for testing. Note that GoogleTest is not downloaded automatically when
+running tests for the first time, which is not the
+[recommended usage](https://github.com/google/googletest/blob/36066cfecf79267bdf46ff82ca6c3b052f8f633c/googletest/docs/faq.md#why-is-it-not-recommended-to-install-a-pre-compiled-copy-of-google-test-for-example-into-usrlocal)
+for it, but this project is just for learning.
 
-## Testing
+Since GoogleTest is written in C++, the test files are also C++ files but call
+the C code using
+[FFI](https://en.wikipedia.org/wiki/Foreign_function_interface).
 
-Unfortunately, to run the tests of this project, it is necessary to have
-installed on the machine the [GoogleTest](https://github.com/google/googletest)
-framework, since it is not downloaded on the fly when trying to run the tests
-for the first time. I know that [this is NOT the correct way of using it](
-https://github.com/google/googletest/blob/36066cfecf79267bdf46ff82ca6c3b052f8f633c/googletest/docs/faq.md#why-is-it-not-recommended-to-install-a-pre-compiled-copy-of-google-test-for-example-into-usrlocal),
-and can lead into undefined behavior, but this is just for learning anyway.
-
-Since the GoogleTest framework is written in C++, the test files also happen
-to be C++ files, but calling the C code ([FFI](
-https://en.wikipedia.org/wiki/Foreign_function_interface)).
-
-To run the tests, use the command below:
+To run the tests, use:
 
 ```bash
 make tests
 ```
 
-## What have I learned with this?
+## What have I learned from this?
 
 - C properties
-- How to create a Makefile in projects with more than just a couple of files
-- How to use GDB
-- How to create and use clang-format
-- How to make syscalls directly from C
+- Creating Makefiles for projects with multiple files
+- Using GDB
+- Creating and using `clang-format`
+- Making syscalls directly from C
 - Pipes and communication between processes
 - IO redirection
-- Tests in C
+- Writing tests in C
 - Input parsing
 - Basic FFI use
