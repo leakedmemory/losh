@@ -10,7 +10,7 @@
 #include "io_handler.h"
 
 void cmd_exec(Command *cmd) {
-    const char *mnemonic = cmd_get_mnemonic(cmd);
+    const char *mnemonic = cmd->args[0];
     char *cmd_path = cmd_find(mnemonic);
     if (cmd_path == NULL) {
         io_perror(mnemonic);
@@ -24,7 +24,7 @@ void cmd_exec(Command *cmd) {
         io_perror("Forking new process failed");
     } else if (pid == 0) {
         // `execv` only returns on error
-        execv(cmd_path, cmd_get_args(cmd));
+        execv(cmd_path, cmd->args);
         exit(EXIT_FAILURE);
     } else {
         waitpid(pid, &pid_status, 0);

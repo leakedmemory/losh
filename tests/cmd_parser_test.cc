@@ -18,9 +18,7 @@ TEST_F(CommandParserTest, NoArgumentsTest) {
     int8_t result = cmd_parse_input(&cmd, input);
     ASSERT_EQ(result, 0);
 
-    EXPECT_STREQ(cmd_get_mnemonic(&cmd), "pwd");
-
-    const char *const *args = cmd_get_args(&cmd);
+    const char *const *args = cmd.args;
     EXPECT_STREQ(args[0], "pwd");
     EXPECT_EQ(args[1], nullptr);
 }
@@ -30,9 +28,7 @@ TEST_F(CommandParserTest, MultipleArgumentsTest) {
     int8_t result = cmd_parse_input(&cmd, input);
     ASSERT_EQ(result, 0);
 
-    EXPECT_STREQ(cmd_get_mnemonic(&cmd), "cp");
-
-    const char *const *args = cmd_get_args(&cmd);
+    const char *const *args = cmd.args;
     EXPECT_STREQ(args[0], "cp");
     EXPECT_STREQ(args[1], "file1.txt");
     EXPECT_STREQ(args[2], "file2.txt");
@@ -44,9 +40,7 @@ TEST_F(CommandParserTest, MultipleSpacesBetweenArgumentsTest) {
     int8_t result = cmd_parse_input(&cmd, input);
     ASSERT_EQ(result, 0);
 
-    EXPECT_STREQ(cmd_get_mnemonic(&cmd), "mv");
-
-    const char *const *args = cmd_get_args(&cmd);
+    const char *const *args = cmd.args;
     EXPECT_STREQ(args[0], "mv");
     EXPECT_STREQ(args[1], "file1.txt");
     EXPECT_STREQ(args[2], "file2.txt");
@@ -58,9 +52,7 @@ TEST_F(CommandParserTest, ArgumentsWithSpacesTest) {
     int8_t result = cmd_parse_input(&cmd, input);
     ASSERT_EQ(result, 0);
 
-    EXPECT_STREQ(cmd_get_mnemonic(&cmd), "echo");
-
-    const char *const *args = cmd_get_args(&cmd);
+    const char *const *args = cmd.args;
     EXPECT_STREQ(args[0], "echo");
     EXPECT_STREQ(args[1], "Hello, World!");
     EXPECT_EQ(args[2], nullptr);
@@ -71,9 +63,7 @@ TEST_F(CommandParserTest, ArgumentsWithOnlySpacesTest) {
     int8_t result = cmd_parse_input(&cmd, input);
     ASSERT_EQ(result, 0);
 
-    EXPECT_STREQ(cmd_get_mnemonic(&cmd), "echo");
-
-    const char *const *args = cmd_get_args(&cmd);
+    const char *const *args = cmd.args;
     EXPECT_STREQ(args[0], "echo");
     EXPECT_STREQ(args[1], "     ");
     EXPECT_STREQ(args[2], "ab");

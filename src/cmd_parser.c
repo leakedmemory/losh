@@ -8,39 +8,39 @@
 #include "error.h"
 
 void cmd_init(Command *cmd) {
-    cmd->_args = NULL;
-    cmd->_size = 0;
+    cmd->args = NULL;
+    cmd->size = 0;
     cmd->_capacity = 8;
 }
 
 void cmd_free(Command *cmd) {
-    free(cmd->_args);
-    cmd->_args = NULL;
-    cmd->_size = 0;
+    free(cmd->args);
+    cmd->args = NULL;
+    cmd->size = 0;
     cmd->_capacity = 0;
 }
 
-void cmd_clean(Command *cmd) { cmd->_size = 0; }
+void cmd_clean(Command *cmd) { cmd->size = 0; }
 
 static int8_t _cmd_add_arg(Command *cmd, char *arg) {
-    if (cmd->_args == NULL) {
-        cmd->_args = malloc(cmd->_capacity * sizeof(char *));
-        if (cmd->_args == NULL) {
+    if (cmd->args == NULL) {
+        cmd->args = malloc(cmd->_capacity * sizeof(char *));
+        if (cmd->args == NULL) {
             set_error_code(SYSTEM_ERROR);
             return -1;
         }
-    } else if (cmd->_size == cmd->_capacity) {
-        char **tmp = realloc(cmd->_args, cmd->_capacity * 2 * sizeof(char *));
+    } else if (cmd->size == cmd->_capacity) {
+        char **tmp = realloc(cmd->args, cmd->_capacity * 2 * sizeof(char *));
         if (tmp == NULL) {
             set_error_code(SYSTEM_ERROR);
             return -1;
         }
 
-        cmd->_args = tmp;
+        cmd->args = tmp;
         cmd->_capacity *= 2;
     }
 
-    cmd->_args[cmd->_size++] = arg;
+    cmd->args[cmd->size++] = arg;
     return 0;
 }
 
@@ -94,7 +94,3 @@ int8_t cmd_parse_input(Command *cmd, char *input) {
 
     return error_code;
 }
-
-const char *cmd_get_mnemonic(Command *cmd) { return cmd->_args[0]; }
-
-char *const *cmd_get_args(Command *cmd) { return cmd->_args; }
