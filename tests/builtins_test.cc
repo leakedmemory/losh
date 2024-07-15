@@ -9,10 +9,10 @@ extern "C" {
 class BuiltinsTest : public ::testing::Test {
    protected:
     char actual_output[1024];
-    FILE *mock_stdout = NULL;
+    FILE *mock_stdout = nullptr;
 
     char actual_err[1024];
-    FILE *mock_stderr = NULL;
+    FILE *mock_stderr = nullptr;
 
     void SetUp() override {
         env_init();
@@ -28,9 +28,9 @@ class BuiltinsTest : public ::testing::Test {
         builtins_free();
         io_free_cfg_singleton();
         fclose(mock_stdout);
-        mock_stdout = NULL;
+        mock_stdout = nullptr;
         fclose(mock_stderr);
-        mock_stderr = NULL;
+        mock_stderr = nullptr;
         env_restore();
     }
 };
@@ -40,7 +40,7 @@ TEST_F(BuiltinsTest, PwdCommandPrintsCurrentWorkingDirectory) {
     BuiltinCmd *pwd_cmd = get_builtin(args[0]);
     ASSERT_NE(pwd_cmd, nullptr);
 
-    pwd_cmd->func(args);
+    EXPECT_EQ(pwd_cmd->func(args), 0);
     io_flush_out_stream();
 
     char expected_output[1024] = {0};
@@ -53,7 +53,7 @@ TEST_F(BuiltinsTest, CdCommandChangesDirectory) {
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
-    cd_cmd->func(args);
+    EXPECT_EQ(cd_cmd->func(args), 0);
     io_flush_out_stream();
 
     char expected_output[1024] = {0};
@@ -66,7 +66,7 @@ TEST_F(BuiltinsTest, CdCommandChangesToRootDirectory) {
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
-    cd_cmd->func(args);
+    EXPECT_EQ(cd_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(getenv("PWD"), "/usr/bin");
@@ -77,7 +77,7 @@ TEST_F(BuiltinsTest, EmptyCdCommandChangesToHomeDirectory) {
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
-    cd_cmd->func(args);
+    EXPECT_EQ(cd_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(getenv("PWD"), getenv("HOME"));
@@ -88,7 +88,7 @@ TEST_F(BuiltinsTest, CdCommandChangesToParentDirectoryOnDoubleDots) {
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
-    cd_cmd->func(args);
+    EXPECT_EQ(cd_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(getenv("PWD"), "/home");
@@ -99,7 +99,7 @@ TEST_F(BuiltinsTest, CdCommandHandlesInvalidPath) {
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
-    cd_cmd->func(args);
+    EXPECT_EQ(cd_cmd->func(args), -1);
     io_flush_err_stream();
 
     EXPECT_STREQ(actual_err, "ERROR: Change directory failed: No such file or directory\n");
@@ -110,7 +110,7 @@ TEST_F(BuiltinsTest, EmptyEchoCommandOutputsNewLine) {
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
-    echo_cmd->func(args);
+    EXPECT_EQ(echo_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "\n");
@@ -121,7 +121,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsSingleString) {
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
-    echo_cmd->func(args);
+    EXPECT_EQ(echo_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "hello world\n");
@@ -132,7 +132,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsMultipleStrings) {
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
-    echo_cmd->func(args);
+    EXPECT_EQ(echo_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "hello world\n");
@@ -143,7 +143,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsEnvironmentVariable) {
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
-    echo_cmd->func(args);
+    EXPECT_EQ(echo_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "losh\n");
@@ -154,7 +154,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsNonEnvironmentVariable) {
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
-    echo_cmd->func(args);
+    EXPECT_EQ(echo_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "$SOMETHING\n");
@@ -166,7 +166,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsMultipleStringsWithEnvironmentVariables) 
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
-    echo_cmd->func(args);
+    EXPECT_EQ(echo_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "hello world       losh $INVALID test\n");
@@ -177,7 +177,7 @@ TEST_F(BuiltinsTest, WhichCommandFindsBuiltinCommand) {
     BuiltinCmd *which_cmd = get_builtin(args[0]);
     ASSERT_NE(which_cmd, nullptr);
 
-    which_cmd->func(args);
+    EXPECT_EQ(which_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "echo: shell built-in command\n");
@@ -188,7 +188,7 @@ TEST_F(BuiltinsTest, WhichCommandFindsExternalCommand) {
     BuiltinCmd *which_cmd = get_builtin(args[0]);
     ASSERT_NE(which_cmd, nullptr);
 
-    which_cmd->func(args);
+    EXPECT_EQ(which_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "/usr/bin/ls\n");
@@ -199,7 +199,7 @@ TEST_F(BuiltinsTest, WhichCommandHandlesNonExistentCommand) {
     BuiltinCmd *which_cmd = get_builtin(args[0]);
     ASSERT_NE(which_cmd, nullptr);
 
-    which_cmd->func(args);
+    EXPECT_EQ(which_cmd->func(args), -1);
     io_flush_err_stream();
 
     EXPECT_STREQ(actual_err, "losh: Command not found: nonexistent\n");
@@ -210,7 +210,7 @@ TEST_F(BuiltinsTest, WhereCommandListsPaths) {
     BuiltinCmd *where_cmd = get_builtin(args[0]);
     ASSERT_NE(where_cmd, nullptr);
 
-    where_cmd->func(args);
+    EXPECT_EQ(where_cmd->func(args), 0);
     io_flush_out_stream();
 
     EXPECT_STREQ(actual_output, "echo: shell built-in command\n/usr/bin/echo\n/bin/echo\n");
@@ -221,7 +221,7 @@ TEST_F(BuiltinsTest, WhereCommandHandlesNonExistentCommand) {
     BuiltinCmd *where_cmd = get_builtin(args[0]);
     ASSERT_NE(where_cmd, nullptr);
 
-    where_cmd->func(args);
+    EXPECT_EQ(where_cmd->func(args), -1);
     io_flush_err_stream();
 
     EXPECT_STREQ(actual_err, "losh: Command not found: nonexistent\n");
