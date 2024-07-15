@@ -1,3 +1,4 @@
+#include "builtins.h"
 #include "cmd_exec.h"
 #include "cmd_parser.h"
 #include "env.h"
@@ -7,6 +8,7 @@
 
 int main(void) {
     env_init();
+    builtins_init();
     io_alloc_cfg_singleton(stdin, stdout, stderr);
 
     char input[INPUT_SIZE];

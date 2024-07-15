@@ -10,21 +10,7 @@
 
 #include "error.h"
 #include "io_handler.h"
-
-static char *_path_concat(const char *parent_path, const char *path) {
-    size_t length = strlen(parent_path) + strlen(path) + 2 * sizeof(char);
-    char *result = calloc(length, sizeof(char));
-    if (result == NULL) {
-        set_error_code(SYSTEM_ERROR);
-        return NULL;
-    }
-
-    strcat(result, parent_path);
-    strcat(result, "/");
-    strcat(result, path);
-    strcat(result, "\0");
-    return result;
-}
+#include "utils.h"
 
 typedef enum { Binary, NotBinary } IsBinaryResult;
 
@@ -33,6 +19,7 @@ static IsBinaryResult _is_binary(const char *path) {
     return stat(path, &file_info) == 0 && file_info.st_mode & S_IXUSR ? Binary : NotBinary;
 }
 
+/* caller should free the return after use */
 char *cmd_find(const char *mnemonic) {
     char *env_path = strdup(getenv("PATH"));
     if (env_path == NULL) {
@@ -44,7 +31,7 @@ char *cmd_find(const char *mnemonic) {
     const char *delim = ":";
     char *exec_path = strtok(env_path, delim);
     while (exec_path) {
-        char *full_path = _path_concat(exec_path, mnemonic);
+        char *full_path = path_concat(exec_path, mnemonic);
         if (full_path == NULL) {
             io_perror("Paths concatenation failed");
             return NULL;
@@ -101,6 +88,7 @@ static int8_t _cmd_matches_push(CmdMatches *matches, char *cmd) {
     return 0;
 }
 
+/* caller should free the return and its elements after use */
 char **cmd_find_all(const char *mnemonic) {
     char *env_path = strdup(getenv("PATH"));
     if (env_path == NULL) {
@@ -114,7 +102,7 @@ char **cmd_find_all(const char *mnemonic) {
     const char *delim = ":";
     char *exec_path = strtok(env_path, delim);
     while (exec_path) {
-        char *full_path = _path_concat(exec_path, mnemonic);
+        char *full_path = path_concat(exec_path, mnemonic);
         if (full_path == NULL) {
             io_perror("Paths concatenation failed");
             return NULL;
