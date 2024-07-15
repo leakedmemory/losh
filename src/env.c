@@ -72,7 +72,7 @@ void env_init(void) {
                           {"HOME", pw->pw_dir},
                           {"PWD", pw->pw_dir},
                           {"PATH", (char *)PATH},
-                          {"SHELL", (char *)"./losh"}};
+                          {"SHELL", (char *)"losh"}};
 #pragma GCC diagnostic pop
 
     _vars_size = sizeof(vars) / sizeof(vars[0]);

@@ -5,7 +5,7 @@ extern "C" {
 #include "env.h"
 }
 
-TEST(EnvTest, SuccessfulInitialization) {
+TEST(EnvTest, SuccessfullInitialization) {
     char *orig_user = getenv("USER") ? strdup(getenv("USER")) : NULL;
     char *orig_home = getenv("HOME") ? strdup(getenv("HOME")) : NULL;
     char *orig_pwd = getenv("PWD") ? strdup(getenv("PWD")) : NULL;
@@ -22,7 +22,7 @@ TEST(EnvTest, SuccessfulInitialization) {
     EXPECT_STREQ(getenv("HOME"), pw->pw_dir);
     EXPECT_STREQ(getenv("PWD"), pw->pw_dir);
     EXPECT_STREQ(getenv("PATH"), "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:.");
-    EXPECT_STREQ(getenv("SHELL"), "./losh");
+    EXPECT_STREQ(getenv("SHELL"), "losh");
 
     env_restore();
 
