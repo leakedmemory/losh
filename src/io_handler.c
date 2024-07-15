@@ -39,7 +39,6 @@ void io_alloc_cfg_singleton(FILE *in, FILE *out, FILE *err) {
 void io_free_cfg_singleton(void) {
     free(_io_cfg);
     _io_cfg = NULL;
-    set_error_code(SUCCESS);
 }
 
 const IOConfig *io_get_cfg_instance(void) { return _io_cfg; }
@@ -61,7 +60,6 @@ int32_t io_read(char *buf, size_t size) {
         if (ferror(_io_cfg->in)) {
             clearerr(_io_cfg->in);
         }
-        set_error_code(SYSTEM_ERROR);
         return -1;
     }
 
@@ -72,18 +70,16 @@ int32_t io_read(char *buf, size_t size) {
         return -1;
     }
 
-    set_error_code(SUCCESS);
-
     return (int32_t)strlen(buf);
 }
+
+int32_t io_puts(const char *s) { return fprintf(_io_cfg->out, "%s\n", s); }
 
 int32_t io_write(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     int32_t chars_written = vfprintf(_io_cfg->out, fmt, args);
     va_end(args);
-
-    set_error_code(SUCCESS);
 
     return chars_written;
 }
@@ -93,8 +89,6 @@ int32_t io_write_err(const char *fmt, ...) {
     va_start(args, fmt);
     int32_t chars_written = vfprintf(_io_cfg->err, fmt, args);
     va_end(args);
-
-    set_error_code(SUCCESS);
 
     return chars_written;
 }

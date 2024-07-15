@@ -34,7 +34,6 @@ TEST_F(IOHandlerTest, ReadValidInput) {
     io_alloc_cfg_singleton(mock_input, stdout, stderr);
     ASSERT_EQ(io_get_in_stream(), mock_input);
     EXPECT_EQ(io_read(buf, sizeof(buf)), 5);
-    EXPECT_EQ(get_error_code(), SUCCESS);
     EXPECT_STREQ(buf, "test\n");
 
     fclose(mock_input);
@@ -57,30 +56,41 @@ TEST_F(IOHandlerTest, ReadInvalidBigInput) {
     fclose(mock_large_input);
 }
 
-TEST_F(IOHandlerTest, WriteToOutStream) {
+TEST_F(IOHandlerTest, PutSToOutStream) {
     char buf[6] = {0};
     FILE *mock_out = fmemopen((void *)buf, sizeof(buf), "w");
     ASSERT_NE(mock_out, nullptr);
 
     io_alloc_cfg_singleton(stdin, mock_out, stderr);
-    EXPECT_EQ(io_write("test\n"), 5);
+    EXPECT_EQ(io_puts("test"), 5);
     io_flush_out_stream();
-    EXPECT_EQ(get_error_code(), SUCCESS);
     EXPECT_STREQ(buf, "test\n");
 
     fclose(mock_out);
 }
 
+TEST_F(IOHandlerTest, WriteToOutStream) {
+    char buf[16] = {0};
+    FILE *mock_out = fmemopen((void *)buf, sizeof(buf), "w");
+    ASSERT_NE(mock_out, nullptr);
+
+    io_alloc_cfg_singleton(stdin, mock_out, stderr);
+    EXPECT_EQ(io_write("test %s\n", "something"), 15);
+    io_flush_out_stream();
+    EXPECT_STREQ(buf, "test something\n");
+
+    fclose(mock_out);
+}
+
 TEST_F(IOHandlerTest, WriteToErrStream) {
-    char buf[6] = {0};
+    char buf[16] = {0};
     FILE *mock_err = fmemopen((void *)buf, sizeof(buf), "w");
     ASSERT_NE(mock_err, nullptr);
 
     io_alloc_cfg_singleton(stdout, stdin, mock_err);
-    EXPECT_EQ(io_write_err("test\n"), 5);
+    EXPECT_EQ(io_write_err("test %s\n", "something"), 15);
     io_flush_err_stream();
-    EXPECT_EQ(get_error_code(), SUCCESS);
-    EXPECT_STREQ(buf, "test\n");
+    EXPECT_STREQ(buf, "test something\n");
 
     fclose(mock_err);
 }

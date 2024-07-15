@@ -13,6 +13,7 @@ const FILE *io_get_in_stream(void);
 const FILE *io_get_err_stream(void);
 
 int32_t io_read(char *buf, size_t size);
+int32_t io_puts(const char *s);
 int32_t io_write(const char *fmt, ...);
 int32_t io_write_err(const char *fmt, ...);
 int32_t io_flush_out_stream(void);
