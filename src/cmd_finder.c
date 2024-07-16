@@ -1,6 +1,3 @@
-// needed to use `strdup` function
-#define _POSIX_C_SOURCE 200809L
-
 #include "cmd_finder.h"
 
 #include <stdint.h>

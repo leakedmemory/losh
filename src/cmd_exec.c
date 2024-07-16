@@ -34,6 +34,7 @@ void cmd_exec(Command *cmd) {
     char *cmd_path = cmd_find(mnemonic);
     if (cmd_path == NULL) {
         io_perror(mnemonic);
+        io_write("\n");
         return;
     }
 

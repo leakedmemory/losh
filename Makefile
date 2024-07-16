@@ -2,6 +2,7 @@ CC := gcc
 CFLAGS := -std=c17 -Wall -Wextra -Wfloat-equal -Wpointer-arith \
 	  -Wstrict-prototypes -Wwrite-strings -Wcast-qual -Wswitch-enum \
 	  -Wconversion -fsanitize=undefined -g3 -Og
+LDFLAGS := -D_POSIX_C_SOURCE=200809L
 
 SRC_DIR := src
 OBJ_DIR := obj
@@ -43,7 +44,7 @@ $(BIN): $(MAIN) $(OBJ)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
 	@echo "  (CC) Compiling '"$<"'"
-	@$(CC) -c $< $(CFLAGS) -MMD -MP -o $@
+	@$(CC) -c $< $(LDFLAGS) $(CFLAGS) -MMD -MP -o $@
 
 # tests compilation
 CXX := g++
@@ -53,7 +54,7 @@ CXXLDFLAGS := -lgtest
 
 TESTS_DIR := tests
 TESTS_OBJ_DIR := $(TESTS_DIR)/obj
-TESTS_INCLUDE := $(SRC_DIR)
+TESTS_INCLUDE := -I$(SRC_DIR)
 
 TESTS_MAIN := $(TESTS_DIR)/main.cc
 TESTS := $(wildcard $(TESTS_DIR)/*.cc)
@@ -81,7 +82,7 @@ $(TESTS_BIN): $(TESTS_MAIN) $(OBJ) $(TESTS_OBJ)
 
 $(TESTS_OBJ_DIR)/%.o: $(TESTS_DIR)/%.cc Makefile
 	@echo "  (CC) Compiling test '"$<"'"
-	@$(CXX) -c $< -I$(TESTS_INCLUDE) $(CXXFLAGS) -MMD -MP -o $@
+	@$(CXX) -c $< $(TESTS_INCLUDE) $(CXXFLAGS) -MMD -MP -o $@
 
 -include $(CDEPS)
 -include $(CXXDEPS)

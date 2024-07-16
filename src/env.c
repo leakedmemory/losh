@@ -1,6 +1,3 @@
-// needed to use `setenv` and `strdup` functions
-#define _POSIX_C_SOURCE 200809L
-
 #include "env.h"
 
 #include <pwd.h>
