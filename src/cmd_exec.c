@@ -12,6 +12,7 @@
 #include "cmd_parser.h"
 #include "error.h"
 #include "io_handler.h"
+#include "jobs.h"
 
 static int32_t _redirect_io(Command *cmd, ExecFunction func) {
     int32_t original_stdin = dup(STDIN_FILENO);
@@ -81,7 +82,6 @@ static int32_t _redirect_io(Command *cmd, ExecFunction func) {
 
 static int32_t _fork_exec(Command *cmd, ExecFunction func) {
     pid_t pid = fork();
-    int32_t pid_status;
     if (pid == -1) {
         set_error_code(SYSTEM_ERROR);
         return -1;
@@ -94,12 +94,24 @@ static int32_t _fork_exec(Command *cmd, ExecFunction func) {
         }
         exit(status_code == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     } else {
-        waitpid(pid, &pid_status, 0);
-        if (!WIFEXITED(pid_status) || WEXITSTATUS(pid_status) != EXIT_SUCCESS) {
-            set_error_code(SYSTEM_ERROR);
-            return -1;
+        if (cmd->is_background) {
+            int32_t job_id = add_job(pid, cmd->args[0]);
+            if (job_id == -1) {
+                io_write_err("ERROR: Job list is full\n");
+                return -1;
+            }
+
+            io_write("[%d] %d\n", job_id, pid);
+            return 0;
+        } else {
+            int32_t pid_status;
+            waitpid(pid, &pid_status, 0);
+            if (!WIFEXITED(pid_status) || WEXITSTATUS(pid_status) != EXIT_SUCCESS) {
+                set_error_code(SYSTEM_ERROR);
+                return -1;
+            }
+            return 0;
         }
-        return 0;
     }
 }
 
@@ -127,7 +139,9 @@ void cmd_exec(Command *cmd) {
             builtin->min_args <= cmd->size - 2 && cmd->size - 2 <= builtin->max_args;
 
         if (has_valid_size_of_args) {
-            if (cmd->output_file != NULL || cmd->input_file != NULL) {
+            if (cmd->is_background) {
+                _fork_exec(cmd, builtin->func);
+            } else if (cmd->output_file != NULL || cmd->input_file != NULL) {
                 _redirect_io(cmd, builtin->func);
             } else {
                 builtin->func(cmd->args);

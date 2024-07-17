@@ -45,9 +45,7 @@ static void _clean_input_stream(void) {
 int32_t io_read(char *buf, size_t size) {
     char *read_result = fgets(buf, (int32_t)size, _io_cfg->in);
     if (read_result == NULL) {
-        if (ferror(_io_cfg->in)) {
-            clearerr(_io_cfg->in);
-        }
+        clearerr(_io_cfg->in);
         return -1;
     }
 

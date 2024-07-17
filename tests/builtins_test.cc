@@ -232,3 +232,5 @@ TEST_F(BuiltinsTest, GetBuiltinReturnsNullOnInvalidMnemonic) {
     BuiltinCmd *nonexistent_cmd = get_builtin(args[0]);
     EXPECT_EQ(nonexistent_cmd, nullptr);
 }
+
+// TODO: make tests of fg

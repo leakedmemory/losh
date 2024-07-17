@@ -5,7 +5,7 @@
 - [x] Execute Commands
 - [x] Built-in Commands
 - [x] IO Redirection
-- [ ] Background Process Execution
+- [x] Background Process Execution
 - [ ] Pipeline and Command Chaining
-- [ ] Signal Handling
+- [x] Signal Handling
 - [ ] Command History

@@ -10,6 +10,7 @@
 #define TK_REDIRECT_INPUT "<"
 #define TK_REDIRECT_OUTPUT_WRITE ">"
 #define TK_REDIRECT_OUTPUT_APPEND ">>"
+#define TK_BACKGROUND_PROCESS "&"
 
 void cmd_init(Command *cmd) {
     cmd->args = NULL;
@@ -17,6 +18,7 @@ void cmd_init(Command *cmd) {
     cmd->input_file = NULL;
     cmd->output_file = NULL;
     cmd->append = false;
+    cmd->is_background = false;
     cmd->_capacity = 8;
 }
 
@@ -29,6 +31,7 @@ void cmd_free(Command *cmd) {
     free(cmd->output_file);
     cmd->output_file = NULL;
     cmd->append = false;
+    cmd->is_background = false;
     cmd->_capacity = 0;
 }
 
@@ -39,6 +42,7 @@ void cmd_clean(Command *cmd) {
     free(cmd->output_file);
     cmd->output_file = NULL;
     cmd->append = false;
+    cmd->is_background = false;
 }
 
 static int8_t _cmd_add_arg(Command *cmd, char *arg) {
@@ -130,6 +134,8 @@ int8_t cmd_parse_input(Command *cmd, char *input) {
                 set_error_code(REDIRECTION_WITHOUT_FILENAME);
                 return -1;
             }
+        } else if (strcmp(tk, TK_BACKGROUND_PROCESS) == 0) {
+            cmd->is_background = true;
         } else {
             error_code = _cmd_add_arg(cmd, tk);
             if (error_code != 0) {

@@ -169,3 +169,96 @@ TEST_F(CommandParserTest, InputRedirectionWithoutFileName) {
     ASSERT_NE(result, 0);
     EXPECT_EQ(get_error_code(), REDIRECTION_WITHOUT_FILENAME);
 }
+
+TEST_F(CommandParserTest, BackgroundProcess) {
+    char input[] = "sleep 5 &";
+    int8_t result = cmd_parse_input(&cmd, input);
+    ASSERT_EQ(result, 0);
+    EXPECT_EQ(cmd.size, 3);
+    EXPECT_TRUE(cmd.is_background);
+
+    const char *const *args = cmd.args;
+    EXPECT_STREQ(args[0], "sleep");
+    EXPECT_STREQ(args[1], "5");
+    EXPECT_EQ(args[2], nullptr);
+}
+
+TEST_F(CommandParserTest, BackgroundProcessWithWriteOutputRedirection) {
+    char input[] = "echo \"hello\" > hello.txt &";
+    int8_t result = cmd_parse_input(&cmd, input);
+    ASSERT_EQ(result, 0);
+    EXPECT_EQ(cmd.size, 3);
+    EXPECT_TRUE(cmd.is_background);
+
+    const char *const *args = cmd.args;
+    EXPECT_STREQ(args[0], "echo");
+    EXPECT_STREQ(args[1], "hello");
+    EXPECT_EQ(args[2], nullptr);
+    EXPECT_STREQ(cmd.output_file, "hello.txt");
+    EXPECT_FALSE(cmd.append);
+    EXPECT_TRUE(cmd.is_background);
+}
+
+TEST_F(CommandParserTest, BackgroundProcessWithAppendOutputRedirection) {
+    char input[] = "echo \"hello\" >> hello.txt &";
+    int8_t result = cmd_parse_input(&cmd, input);
+    ASSERT_EQ(result, 0);
+    EXPECT_EQ(cmd.size, 3);
+    EXPECT_TRUE(cmd.is_background);
+
+    const char *const *args = cmd.args;
+    EXPECT_STREQ(args[0], "echo");
+    EXPECT_STREQ(args[1], "hello");
+    EXPECT_EQ(args[2], nullptr);
+    EXPECT_STREQ(cmd.output_file, "hello.txt");
+    EXPECT_TRUE(cmd.append);
+    EXPECT_TRUE(cmd.is_background);
+}
+
+TEST_F(CommandParserTest, BackgroundProcessWithInputRedirection) {
+    char input[] = "grep \"error\" < log.txt &";
+    int8_t result = cmd_parse_input(&cmd, input);
+    ASSERT_EQ(result, 0);
+    EXPECT_EQ(cmd.size, 3);
+    EXPECT_TRUE(cmd.is_background);
+
+    const char *const *args = cmd.args;
+    EXPECT_STREQ(args[0], "grep");
+    EXPECT_STREQ(args[1], "error");
+    EXPECT_EQ(args[2], nullptr);
+    EXPECT_STREQ(cmd.input_file, "log.txt");
+    EXPECT_FALSE(cmd.append);
+    EXPECT_TRUE(cmd.is_background);
+}
+
+TEST_F(CommandParserTest, BackgroundProcessWithBothRedirectionsWrite) {
+    char input[] = "sort < numbers.txt > sorted.txt &";
+    int8_t result = cmd_parse_input(&cmd, input);
+    ASSERT_EQ(result, 0);
+    EXPECT_EQ(cmd.size, 2);
+    EXPECT_TRUE(cmd.is_background);
+
+    const char *const *args = cmd.args;
+    EXPECT_STREQ(args[0], "sort");
+    EXPECT_EQ(args[1], nullptr);
+    EXPECT_STREQ(cmd.input_file, "numbers.txt");
+    EXPECT_STREQ(cmd.output_file, "sorted.txt");
+    EXPECT_FALSE(cmd.append);
+    EXPECT_TRUE(cmd.is_background);
+}
+
+TEST_F(CommandParserTest, BackgroundProcessWithBothRedirectionsAppend) {
+    char input[] = "sort < numbers.txt >> sorted.txt &";
+    int8_t result = cmd_parse_input(&cmd, input);
+    ASSERT_EQ(result, 0);
+    EXPECT_EQ(cmd.size, 2);
+    EXPECT_TRUE(cmd.is_background);
+
+    const char *const *args = cmd.args;
+    EXPECT_STREQ(args[0], "sort");
+    EXPECT_EQ(args[1], nullptr);
+    EXPECT_STREQ(cmd.input_file, "numbers.txt");
+    EXPECT_STREQ(cmd.output_file, "sorted.txt");
+    EXPECT_TRUE(cmd.append);
+    EXPECT_TRUE(cmd.is_background);
+}

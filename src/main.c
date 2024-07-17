@@ -1,26 +1,35 @@
+#include <stdlib.h>
+
 #include "builtins.h"
 #include "cmd_exec.h"
 #include "cmd_parser.h"
 #include "env.h"
 #include "io_handler.h"
+#include "prompt.h"
+#include "signal_handler.h"
 
-#define INPUT_SIZE 4096
+#define MAX_INPUT_SIZE 4096
 
 int main(void) {
     env_init();
     builtins_init();
+    set_signal_handlers();
     io_alloc_cfg_singleton(stdin, stdout, stderr);
 
-    char input[INPUT_SIZE];
+    char input[MAX_INPUT_SIZE];
     Command cmd;
     cmd_init(&cmd);
 
     while (1) {
-        io_write("losh$ ");
-        io_flush(io_instance()->out);
+        write_prompt();
 
-        if (io_read(input, INPUT_SIZE) < 0) {
-            io_perror("Input reading failed");
+        int32_t bytes_read = io_read(input, MAX_INPUT_SIZE);
+        // ctrl + d
+        if (bytes_read == EOF) {
+            io_write("\n");
+            exit(EXIT_FAILURE);
+        } else if (bytes_read <= 0) {
+            io_write_err("ERROR: Input reading failed\n");
             continue;
         }
 

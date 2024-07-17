@@ -10,6 +10,7 @@
 #include "cmd_finder.h"
 #include "error.h"
 #include "io_handler.h"
+#include "jobs.h"
 #include "utils.h"
 
 // should be a prime number
@@ -66,13 +67,13 @@ static bool _is_builtin(const char *mnemonic) { return get_builtin(mnemonic) != 
 static int32_t _cd(char **args) {
     char *home = getenv("HOME");
     if (home == NULL) {
-        io_write_err("Could not find $HOME environment variable\n");
+        io_write_err("ERROR: Could not find $HOME environment variable\n");
         return -1;
     }
 
     const char *pwd = getenv("PWD");
     if (pwd == NULL) {
-        io_write_err("Could not find $PWD environment variable\n");
+        io_write_err("ERROR: Could not find $PWD environment variable\n");
         return -1;
     }
 
@@ -138,7 +139,7 @@ static int32_t _pwd(char **args) {
     if (pwd != NULL) {
         io_puts(pwd);
     } else {
-        io_write_err("Could not find $PWD environment variable\n");
+        io_write_err("ERROR: Could not find $PWD environment variable\n");
         status = -1;
     }
 
@@ -213,12 +214,32 @@ static int32_t _where(char **args) {
     return status;
 }
 
+static int32_t _fg(char **args) {
+    if (args[1] == NULL) {
+        if (job_list_is_empty()) {
+            io_write("fg: no current job\n");
+        } else {
+            print_jobs();
+        }
+
+        return 0;
+    }
+
+    int32_t job_id = atoi(args[1]);
+    if (job_id == 0) {
+        io_write_err("ERROR: Argument passed is a not a number: %s\n", args[1]);
+    }
+
+    return bring_to_foreground(job_id);
+}
+
 void builtins_init(void) {
     // make sure the size is less than or equal to BUILTINS_HASH_MAP_CAPACITY
     // when adding a new builtin command
     HashNode builtins[] = {NODE("pwd", _pwd, 0, 0),        NODE("cd", _cd, 0, 1),
                            NODE("exit", _losh_exit, 0, 0), NODE("echo", _echo, 0, UINT32_MAX),
-                           NODE("which", _which, 1, 1),    NODE("where", _where, 1, 1)};
+                           NODE("which", _which, 1, 1),    NODE("where", _where, 1, 1),
+                           NODE("fg", _fg, 0, 1)};
 
     size_t builtins_size = sizeof(builtins) / sizeof(builtins[0]);
     for (size_t i = 0; i < builtins_size; i++) {

@@ -10,6 +10,7 @@ typedef struct {
     char *input_file;
     char *output_file;
     bool append;
+    bool is_background;
 
     size_t _capacity;
 } Command;
