@@ -34,5 +34,7 @@ int main(void) {
         } else {
             io_perror("Input parsing failed");
         }
+
+        io_write("\n");
     }
 }

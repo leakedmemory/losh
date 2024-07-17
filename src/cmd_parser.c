@@ -7,9 +7,16 @@
 
 #include "error.h"
 
+#define TK_REDIRECT_INPUT "<"
+#define TK_REDIRECT_OUTPUT_WRITE ">"
+#define TK_REDIRECT_OUTPUT_APPEND ">>"
+
 void cmd_init(Command *cmd) {
     cmd->args = NULL;
     cmd->size = 0;
+    cmd->input_file = NULL;
+    cmd->output_file = NULL;
+    cmd->append = false;
     cmd->_capacity = 8;
 }
 
@@ -17,10 +24,22 @@ void cmd_free(Command *cmd) {
     free(cmd->args);
     cmd->args = NULL;
     cmd->size = 0;
+    free(cmd->input_file);
+    cmd->input_file = NULL;
+    free(cmd->output_file);
+    cmd->output_file = NULL;
+    cmd->append = false;
     cmd->_capacity = 0;
 }
 
-void cmd_clean(Command *cmd) { cmd->size = 0; }
+void cmd_clean(Command *cmd) {
+    cmd->size = 0;
+    free(cmd->input_file);
+    cmd->input_file = NULL;
+    free(cmd->output_file);
+    cmd->output_file = NULL;
+    cmd->append = false;
+}
 
 static int8_t _cmd_add_arg(Command *cmd, char *arg) {
     if (cmd->args == NULL) {
@@ -85,9 +104,37 @@ int8_t cmd_parse_input(Command *cmd, char *input) {
     int8_t error_code = 0;
     char *tk;
     while ((tk = _get_next_token(&input)) != NULL) {
-        error_code = _cmd_add_arg(cmd, tk);
-        if (error_code != 0) {
-            return error_code;
+        if (strcmp(tk, TK_REDIRECT_OUTPUT_WRITE) == 0 ||
+            strcmp(tk, TK_REDIRECT_OUTPUT_APPEND) == 0) {
+            cmd->append = strcmp(tk, TK_REDIRECT_OUTPUT_APPEND) == 0;
+            tk = _get_next_token(&input);
+            if (tk != NULL) {
+                cmd->output_file = strdup(tk);
+                if (cmd->output_file == NULL) {
+                    set_error_code(SYSTEM_ERROR);
+                    return -1;
+                }
+            } else {
+                set_error_code(REDIRECTION_WITHOUT_FILENAME);
+                return -1;
+            }
+        } else if (strcmp(tk, TK_REDIRECT_INPUT) == 0) {
+            tk = _get_next_token(&input);
+            if (tk != NULL) {
+                cmd->input_file = strdup(tk);
+                if (cmd->input_file == NULL) {
+                    set_error_code(SYSTEM_ERROR);
+                    return -1;
+                }
+            } else {
+                set_error_code(REDIRECTION_WITHOUT_FILENAME);
+                return -1;
+            }
+        } else {
+            error_code = _cmd_add_arg(cmd, tk);
+            if (error_code != 0) {
+                return error_code;
+            }
         }
     }
     error_code = _cmd_add_arg(cmd, NULL);

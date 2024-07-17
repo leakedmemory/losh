@@ -95,6 +95,7 @@ void io_perror(const char *msg) {
             break;
         case IO_INPUT_TOO_BIG:
         case SYSTEM_ERROR:
+        case REDIRECTION_WITHOUT_FILENAME:
             io_write_err("ERROR: %s: %s\n", msg, err_msg);
             break;
         case IO_CFG_ALREADY_INITIALIZED:

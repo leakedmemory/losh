@@ -17,6 +17,8 @@ const char *get_error_msg(ErrorCode code) {
             return "IOConfig already initialized";
         case IO_INPUT_TOO_BIG:
             return "Input size was too big";
+        case REDIRECTION_WITHOUT_FILENAME:
+            return "Path to file redirection not specified";
         case CMD_NOT_FOUND:
             return "Command not found";
         case SYSTEM_ERROR:
