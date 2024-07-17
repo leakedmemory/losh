@@ -17,7 +17,7 @@ int main(void) {
 
     while (1) {
         io_write("losh$ ");
-        io_flush_out_stream();
+        io_flush(io_instance()->out);
 
         if (io_read(input, INPUT_SIZE) < 0) {
             io_perror("Input reading failed");

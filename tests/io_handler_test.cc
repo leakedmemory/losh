@@ -14,15 +14,12 @@ class IOHandlerTest : public ::testing::Test {
 
 TEST_F(IOHandlerTest, AllocCfgSingleton) {
     io_alloc_cfg_singleton(stdin, stdout, stderr);
-    const IOConfig *io_cfg = io_get_cfg_instance();
+    const IOConfig *io_cfg = io_instance();
     ASSERT_NE(io_cfg, nullptr);
-    EXPECT_EQ(io_get_in_stream(), stdin);
-    EXPECT_EQ(io_get_out_stream(), stdout);
-    EXPECT_EQ(io_get_err_stream(), stderr);
     EXPECT_EQ(get_error_code(), SUCCESS);
 
     io_alloc_cfg_singleton(stdin, stdout, stderr);
-    EXPECT_EQ(io_cfg, io_get_cfg_instance());
+    EXPECT_EQ(io_cfg, io_instance());
     EXPECT_EQ(get_error_code(), IO_CFG_ALREADY_INITIALIZED);
 }
 
@@ -32,7 +29,7 @@ TEST_F(IOHandlerTest, ReadValidInput) {
     ASSERT_NE(mock_input, nullptr);
 
     io_alloc_cfg_singleton(mock_input, stdout, stderr);
-    ASSERT_EQ(io_get_in_stream(), mock_input);
+    ASSERT_EQ(io_instance()->in, mock_input);
     EXPECT_EQ(io_read(buf, sizeof(buf)), 5);
     EXPECT_STREQ(buf, "test\n");
 
@@ -45,7 +42,7 @@ TEST_F(IOHandlerTest, ReadInvalidBigInput) {
     ASSERT_NE(mock_large_input, nullptr);
 
     io_alloc_cfg_singleton(mock_large_input, stdout, stderr);
-    ASSERT_EQ(io_get_in_stream(), mock_large_input);
+    ASSERT_EQ(io_instance()->in, mock_large_input);
     EXPECT_EQ(io_read(buf, sizeof(buf)), -1);
     EXPECT_EQ(get_error_code(), IO_INPUT_TOO_BIG);
 
@@ -63,7 +60,7 @@ TEST_F(IOHandlerTest, PutSToOutStream) {
 
     io_alloc_cfg_singleton(stdin, mock_out, stderr);
     EXPECT_EQ(io_puts("test"), 5);
-    io_flush_out_stream();
+    io_flush(io_instance()->out);
     EXPECT_STREQ(buf, "test\n");
 
     fclose(mock_out);
@@ -76,7 +73,7 @@ TEST_F(IOHandlerTest, WriteToOutStream) {
 
     io_alloc_cfg_singleton(stdin, mock_out, stderr);
     EXPECT_EQ(io_write("test %s\n", "something"), 15);
-    io_flush_out_stream();
+    io_flush(io_instance()->out);
     EXPECT_STREQ(buf, "test something\n");
 
     fclose(mock_out);
@@ -89,7 +86,7 @@ TEST_F(IOHandlerTest, WriteToErrStream) {
 
     io_alloc_cfg_singleton(stdout, stdin, mock_err);
     EXPECT_EQ(io_write_err("test %s\n", "something"), 15);
-    io_flush_err_stream();
+    io_flush(io_instance()->err);
     EXPECT_STREQ(buf, "test something\n");
 
     fclose(mock_err);

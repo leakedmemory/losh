@@ -11,12 +11,6 @@
 
 static IOConfig *_io_cfg = NULL;
 
-typedef struct IOConfig {
-    FILE *in;
-    FILE *out;
-    FILE *err;
-} IOConfig;
-
 void io_alloc_cfg_singleton(FILE *in, FILE *out, FILE *err) {
     if (_io_cfg == NULL) {
         _io_cfg = malloc(sizeof(IOConfig));
@@ -41,13 +35,7 @@ void io_free_cfg_singleton(void) {
     _io_cfg = NULL;
 }
 
-const IOConfig *io_get_cfg_instance(void) { return _io_cfg; }
-
-const FILE *io_get_in_stream(void) { return _io_cfg->in; }
-
-const FILE *io_get_out_stream(void) { return _io_cfg->out; }
-
-const FILE *io_get_err_stream(void) { return _io_cfg->err; }
+const IOConfig *io_instance(void) { return _io_cfg; }
 
 static void _clean_input_stream(void) {
     int c;
@@ -93,14 +81,8 @@ int32_t io_write_err(const char *fmt, ...) {
     return chars_written;
 }
 
-int32_t io_flush_out_stream(void) {
-    int32_t result = fflush(_io_cfg->out);
-    set_error_code(result == 0 ? SUCCESS : SYSTEM_ERROR);
-    return result;
-}
-
-int32_t io_flush_err_stream(void) {
-    int32_t result = fflush(_io_cfg->err);
+int32_t io_flush(FILE *stream) {
+    int32_t result = fflush(stream);
     set_error_code(result == 0 ? SUCCESS : SYSTEM_ERROR);
     return result;
 }
