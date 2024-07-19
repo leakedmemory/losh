@@ -4,6 +4,7 @@
 #include "cmd_exec.h"
 #include "cmd_parser.h"
 #include "env.h"
+#include "history.h"
 #include "io_handler.h"
 #include "prompt.h"
 #include "signal_handler.h"
@@ -36,6 +37,13 @@ int main(void) {
         if (input[0] == '\n') {
             continue;
         }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+        if (save_cmd_in_history(input, (size_t)bytes_read, CMD_HISTORY_PATH) != 0) {
+            io_perror("Saving command in history failed");
+        }
+#pragma GCC diagnostic pop
 
         if (cmd_parse_input(&cmd, input) == 0) {
             cmd_exec(&cmd);

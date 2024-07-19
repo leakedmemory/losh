@@ -9,6 +9,7 @@
 
 #include "cmd_finder.h"
 #include "error.h"
+#include "history.h"
 #include "io_handler.h"
 #include "jobs.h"
 #include "utils.h"
@@ -64,6 +65,7 @@ BuiltinCmd *get_builtin(const char *mnemonic) {
 
 static bool _is_builtin(const char *mnemonic) { return get_builtin(mnemonic) != NULL; }
 
+// TODO: make ~ expand to $HOME
 static int32_t _cd(char **args) {
     char *home = getenv("HOME");
     if (home == NULL) {
@@ -233,13 +235,18 @@ static int32_t _fg(char **args) {
     return bring_to_foreground(job_id);
 }
 
+static int32_t _history(char **args) {
+    (void)args;
+    return print_cmd_history(CMD_HISTORY_PATH);
+}
+
 void builtins_init(void) {
     // make sure the size is less than or equal to BUILTINS_HASH_MAP_CAPACITY
     // when adding a new builtin command
     HashNode builtins[] = {NODE("pwd", _pwd, 0, 0),        NODE("cd", _cd, 0, 1),
                            NODE("exit", _losh_exit, 0, 0), NODE("echo", _echo, 0, UINT32_MAX),
                            NODE("which", _which, 1, 1),    NODE("where", _where, 1, 1),
-                           NODE("fg", _fg, 0, 1)};
+                           NODE("fg", _fg, 0, 1),          NODE("history", _history, 0, 0)};
 
     size_t builtins_size = sizeof(builtins) / sizeof(builtins[0]);
     for (size_t i = 0; i < builtins_size; i++) {

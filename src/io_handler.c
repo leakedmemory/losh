@@ -94,8 +94,11 @@ void io_perror(const char *msg) {
         case IO_INPUT_TOO_BIG:
         case SYSTEM_ERROR:
         case REDIRECTION_WITHOUT_FILENAME:
+        case HISTORY_READ_FAILED:
+        case HISTORY_OPEN_FAILED:
             io_write_err("ERROR: %s: %s\n", msg, err_msg);
             break;
+        case HISTORY_WRITE_FAILED:
         case IO_CFG_ALREADY_INITIALIZED:
             io_write_err("WARNING: %s: %s\n", msg, err_msg);
             break;

@@ -8,4 +8,5 @@
 - [x] Background Process Execution
 - [ ] Pipeline and Command Chaining
 - [x] Signal Handling
-- [ ] Command History
+- [x] Command History
+- [ ] Arrows

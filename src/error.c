@@ -21,6 +21,11 @@ const char *get_error_msg(ErrorCode code) {
             return "Path to file redirection not specified";
         case CMD_NOT_FOUND:
             return "Command not found";
+        case HISTORY_READ_FAILED:
+            return "Could not read command history";
+        case HISTORY_WRITE_FAILED:
+            return "Could not save command in history";
+        case HISTORY_OPEN_FAILED:
         case SYSTEM_ERROR:
             return strerror(errno);
     }

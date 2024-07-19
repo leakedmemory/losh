@@ -7,6 +7,8 @@
 #include "io_handler.h"
 #include "signal_handler.h"
 
+// TODO: change between user ($) and root (#) symbols
+// TODO: change prompt fmt to "user | pwd $> "
 void write_prompt(void) {
     if (input_buffer_is_dirty) {
         // discards data written to the object referred to by fd but not transmitted
