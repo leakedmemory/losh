@@ -47,7 +47,7 @@ TEST_F(CmdFinderTest, FindExistentCommandAll) {
     EXPECT_EQ(results[2], nullptr);
     EXPECT_EQ(get_error_code(), SUCCESS);
 
-    for (size_t i = 0; results[i] != NULL; i++) {
+    for (size_t i = 0; results[i] != nullptr; i++) {
         free(results[i]);
     }
     free(results);

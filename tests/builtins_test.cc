@@ -36,7 +36,7 @@ class BuiltinsTest : public ::testing::Test {
 };
 
 TEST_F(BuiltinsTest, PwdCommandPrintsCurrentWorkingDirectory) {
-    char *args[] = {(char *)"pwd", NULL};
+    char *args[] = {(char *)"pwd", nullptr};
     BuiltinCmd *pwd_cmd = get_builtin(args[0]);
     ASSERT_NE(pwd_cmd, nullptr);
 
@@ -49,7 +49,7 @@ TEST_F(BuiltinsTest, PwdCommandPrintsCurrentWorkingDirectory) {
 }
 
 TEST_F(BuiltinsTest, CdCommandChangesDirectory) {
-    char *args[] = {(char *)"cd", (char *)"Documents", NULL};
+    char *args[] = {(char *)"cd", (char *)"Documents", nullptr};
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
@@ -62,7 +62,7 @@ TEST_F(BuiltinsTest, CdCommandChangesDirectory) {
 }
 
 TEST_F(BuiltinsTest, CdCommandChangesToRootDirectory) {
-    char *args[] = {(char *)"cd", (char *)"/usr/bin", NULL};
+    char *args[] = {(char *)"cd", (char *)"/usr/bin", nullptr};
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
@@ -72,8 +72,43 @@ TEST_F(BuiltinsTest, CdCommandChangesToRootDirectory) {
     EXPECT_STREQ(getenv("PWD"), "/usr/bin");
 }
 
+TEST_F(BuiltinsTest, CdCommandExpandsSoloTilde) {
+    char *args[] = {(char *)"cd", (char *)"~", nullptr};
+    BuiltinCmd *cd_cmd = get_builtin(args[0]);
+    ASSERT_NE(cd_cmd, nullptr);
+
+    EXPECT_EQ(cd_cmd->func(args), 0);
+    io_flush(io_instance()->out);
+
+    EXPECT_STREQ(getenv("PWD"), getenv("HOME"));
+}
+
+TEST_F(BuiltinsTest, CdCommandExpandsTildeWithSlash) {
+    char *args[] = {(char *)"cd", (char *)"~/", nullptr};
+    BuiltinCmd *cd_cmd = get_builtin(args[0]);
+    ASSERT_NE(cd_cmd, nullptr);
+
+    EXPECT_EQ(cd_cmd->func(args), 0);
+    io_flush(io_instance()->out);
+
+    EXPECT_STREQ(getenv("PWD"), getenv("HOME"));
+}
+
+TEST_F(BuiltinsTest, CdCommandExpandsTildeNormalPath) {
+    char *args[] = {(char *)"cd", (char *)"~/.local/share", nullptr};
+    BuiltinCmd *cd_cmd = get_builtin(args[0]);
+    ASSERT_NE(cd_cmd, nullptr);
+
+    EXPECT_EQ(cd_cmd->func(args), 0);
+    io_flush(io_instance()->out);
+
+    char expected_output[1024] = {0};
+    snprintf(expected_output, sizeof(expected_output), "%s/.local/share", getenv("HOME"));
+    EXPECT_STREQ(getenv("PWD"), expected_output);
+}
+
 TEST_F(BuiltinsTest, EmptyCdCommandChangesToHomeDirectory) {
-    char *args[] = {(char *)"cd", NULL};
+    char *args[] = {(char *)"cd", nullptr};
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
@@ -84,7 +119,7 @@ TEST_F(BuiltinsTest, EmptyCdCommandChangesToHomeDirectory) {
 }
 
 TEST_F(BuiltinsTest, CdCommandChangesToParentDirectoryOnDoubleDots) {
-    char *args[] = {(char *)"cd", (char *)"..", NULL};
+    char *args[] = {(char *)"cd", (char *)"..", nullptr};
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
@@ -95,7 +130,7 @@ TEST_F(BuiltinsTest, CdCommandChangesToParentDirectoryOnDoubleDots) {
 }
 
 TEST_F(BuiltinsTest, CdCommandHandlesInvalidPath) {
-    char *args[] = {(char *)"cd", (char *)"nonexistent", NULL};
+    char *args[] = {(char *)"cd", (char *)"nonexistent", nullptr};
     BuiltinCmd *cd_cmd = get_builtin(args[0]);
     ASSERT_NE(cd_cmd, nullptr);
 
@@ -106,7 +141,7 @@ TEST_F(BuiltinsTest, CdCommandHandlesInvalidPath) {
 }
 
 TEST_F(BuiltinsTest, EmptyEchoCommandOutputsNewLine) {
-    char *args[] = {(char *)"echo", NULL};
+    char *args[] = {(char *)"echo", nullptr};
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
@@ -117,7 +152,7 @@ TEST_F(BuiltinsTest, EmptyEchoCommandOutputsNewLine) {
 }
 
 TEST_F(BuiltinsTest, EchoCommandOutputsSingleString) {
-    char *args[] = {(char *)"echo", (char *)"hello world", NULL};
+    char *args[] = {(char *)"echo", (char *)"hello world", nullptr};
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
@@ -128,7 +163,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsSingleString) {
 }
 
 TEST_F(BuiltinsTest, EchoCommandOutputsMultipleStrings) {
-    char *args[] = {(char *)"echo", (char *)"hello", (char *)"world", NULL};
+    char *args[] = {(char *)"echo", (char *)"hello", (char *)"world", nullptr};
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
@@ -139,7 +174,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsMultipleStrings) {
 }
 
 TEST_F(BuiltinsTest, EchoCommandOutputsEnvironmentVariable) {
-    char *args[] = {(char *)"echo", (char *)"$SHELL", NULL};
+    char *args[] = {(char *)"echo", (char *)"$SHELL", nullptr};
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
@@ -150,7 +185,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsEnvironmentVariable) {
 }
 
 TEST_F(BuiltinsTest, EchoCommandOutputsNonEnvironmentVariable) {
-    char *args[] = {(char *)"echo", (char *)"$SOMETHING", NULL};
+    char *args[] = {(char *)"echo", (char *)"$SOMETHING", nullptr};
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
@@ -162,7 +197,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsNonEnvironmentVariable) {
 
 TEST_F(BuiltinsTest, EchoCommandOutputsMultipleStringsWithEnvironmentVariables) {
     char *args[] = {(char *)"echo",   (char *)"hello",    (char *)"world", (char *)"     ",
-                    (char *)"$SHELL", (char *)"$INVALID", (char *)"test",  NULL};
+                    (char *)"$SHELL", (char *)"$INVALID", (char *)"test",  nullptr};
     BuiltinCmd *echo_cmd = get_builtin(args[0]);
     ASSERT_NE(echo_cmd, nullptr);
 
@@ -173,7 +208,7 @@ TEST_F(BuiltinsTest, EchoCommandOutputsMultipleStringsWithEnvironmentVariables) 
 }
 
 TEST_F(BuiltinsTest, WhichCommandFindsBuiltinCommand) {
-    char *args[] = {(char *)"which", (char *)"echo", NULL};
+    char *args[] = {(char *)"which", (char *)"echo", nullptr};
     BuiltinCmd *which_cmd = get_builtin(args[0]);
     ASSERT_NE(which_cmd, nullptr);
 
@@ -184,7 +219,7 @@ TEST_F(BuiltinsTest, WhichCommandFindsBuiltinCommand) {
 }
 
 TEST_F(BuiltinsTest, WhichCommandFindsExternalCommand) {
-    char *args[] = {(char *)"which", (char *)"ls", NULL};
+    char *args[] = {(char *)"which", (char *)"ls", nullptr};
     BuiltinCmd *which_cmd = get_builtin(args[0]);
     ASSERT_NE(which_cmd, nullptr);
 
@@ -195,7 +230,7 @@ TEST_F(BuiltinsTest, WhichCommandFindsExternalCommand) {
 }
 
 TEST_F(BuiltinsTest, WhichCommandHandlesNonExistentCommand) {
-    char *args[] = {(char *)"which", (char *)"nonexistent", NULL};
+    char *args[] = {(char *)"which", (char *)"nonexistent", nullptr};
     BuiltinCmd *which_cmd = get_builtin(args[0]);
     ASSERT_NE(which_cmd, nullptr);
 
@@ -206,7 +241,7 @@ TEST_F(BuiltinsTest, WhichCommandHandlesNonExistentCommand) {
 }
 
 TEST_F(BuiltinsTest, WhereCommandListsPaths) {
-    char *args[] = {(char *)"where", (char *)"echo", NULL};
+    char *args[] = {(char *)"where", (char *)"echo", nullptr};
     BuiltinCmd *where_cmd = get_builtin(args[0]);
     ASSERT_NE(where_cmd, nullptr);
 
@@ -217,7 +252,7 @@ TEST_F(BuiltinsTest, WhereCommandListsPaths) {
 }
 
 TEST_F(BuiltinsTest, WhereCommandHandlesNonExistentCommand) {
-    char *args[] = {(char *)"where", (char *)"nonexistent", NULL};
+    char *args[] = {(char *)"where", (char *)"nonexistent", nullptr};
     BuiltinCmd *where_cmd = get_builtin(args[0]);
     ASSERT_NE(where_cmd, nullptr);
 
@@ -228,7 +263,7 @@ TEST_F(BuiltinsTest, WhereCommandHandlesNonExistentCommand) {
 }
 
 TEST_F(BuiltinsTest, GetBuiltinReturnsNullOnInvalidMnemonic) {
-    char *args[] = {(char *)"nonexistent", NULL};
+    char *args[] = {(char *)"nonexistent", nullptr};
     BuiltinCmd *nonexistent_cmd = get_builtin(args[0]);
     EXPECT_EQ(nonexistent_cmd, nullptr);
 }

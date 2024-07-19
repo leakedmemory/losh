@@ -6,11 +6,11 @@ extern "C" {
 }
 
 TEST(EnvTest, SuccessfullInitialization) {
-    char *orig_user = getenv("USER") ? strdup(getenv("USER")) : NULL;
-    char *orig_home = getenv("HOME") ? strdup(getenv("HOME")) : NULL;
-    char *orig_pwd = getenv("PWD") ? strdup(getenv("PWD")) : NULL;
-    char *orig_path = getenv("PATH") ? strdup(getenv("PATH")) : NULL;
-    char *orig_shell = getenv("SHELL") ? strdup(getenv("SHELL")) : NULL;
+    char *orig_user = getenv("USER") ? strdup(getenv("USER")) : nullptr;
+    char *orig_home = getenv("HOME") ? strdup(getenv("HOME")) : nullptr;
+    char *orig_pwd = getenv("PWD") ? strdup(getenv("PWD")) : nullptr;
+    char *orig_path = getenv("PATH") ? strdup(getenv("PATH")) : nullptr;
+    char *orig_shell = getenv("SHELL") ? strdup(getenv("SHELL")) : nullptr;
 
     env_init();
 

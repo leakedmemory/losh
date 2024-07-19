@@ -65,7 +65,6 @@ BuiltinCmd *get_builtin(const char *mnemonic) {
 
 static bool _is_builtin(const char *mnemonic) { return get_builtin(mnemonic) != NULL; }
 
-// TODO: make ~ expand to $HOME
 static int32_t _cd(char **args) {
     char *home = getenv("HOME");
     if (home == NULL) {
@@ -79,7 +78,17 @@ static int32_t _cd(char **args) {
         return -1;
     }
 
-    char *path = args[1];
+    char *path;
+    if (args[1] != NULL && args[1][0] == '~') {
+        path = expand_tilde(args[1]);
+        if (path == NULL) {
+            io_perror("Tilde expansion failed");
+            return -1;
+        }
+    } else {
+        path = args[1];
+    }
+
     char *new_dir;
     bool should_free_new_dir = false;
     if (path == NULL) {

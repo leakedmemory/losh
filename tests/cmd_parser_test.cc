@@ -86,7 +86,7 @@ TEST_F(CommandParserTest, WriteOutputRedirection) {
     EXPECT_STREQ(args[0], "echo");
     EXPECT_STREQ(args[1], "hello");
     EXPECT_EQ(args[2], nullptr);
-    EXPECT_STREQ(cmd.input_file, NULL);
+    EXPECT_STREQ(cmd.input_file, nullptr);
     EXPECT_STREQ(cmd.output_file, "hello.txt");
     EXPECT_FALSE(cmd.append);
 }
@@ -101,7 +101,7 @@ TEST_F(CommandParserTest, AppendOutputRedirection) {
     EXPECT_STREQ(args[0], "echo");
     EXPECT_STREQ(args[1], "hello");
     EXPECT_EQ(args[2], nullptr);
-    EXPECT_STREQ(cmd.input_file, NULL);
+    EXPECT_STREQ(cmd.input_file, nullptr);
     EXPECT_STREQ(cmd.output_file, "hello.txt");
     EXPECT_TRUE(cmd.append);
 }
@@ -117,7 +117,7 @@ TEST_F(CommandParserTest, InputRedirection) {
     EXPECT_STREQ(args[1], "error");
     EXPECT_EQ(args[2], nullptr);
     EXPECT_STREQ(cmd.input_file, "log.txt");
-    EXPECT_STREQ(cmd.output_file, NULL);
+    EXPECT_STREQ(cmd.output_file, nullptr);
     EXPECT_FALSE(cmd.append);
 }
 
