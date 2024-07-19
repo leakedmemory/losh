@@ -67,17 +67,7 @@ static bool _is_builtin(const char *mnemonic) { return get_builtin(mnemonic) != 
 
 static int32_t _cd(char **args) {
     char *home = getenv("HOME");
-    if (home == NULL) {
-        io_write_err("ERROR: Could not find $HOME environment variable\n");
-        return -1;
-    }
-
     const char *pwd = getenv("PWD");
-    if (pwd == NULL) {
-        io_write_err("ERROR: Could not find $PWD environment variable\n");
-        return -1;
-    }
-
     char *path;
     if (args[1] != NULL && args[1][0] == '~') {
         path = expand_tilde(args[1]);
@@ -145,21 +135,13 @@ static int32_t _cd(char **args) {
 
 static int32_t _pwd(char **args) {
     (void)args;
-    int32_t status = 0;
-    const char *pwd = getenv("PWD");
-    if (pwd != NULL) {
-        io_puts(pwd);
-    } else {
-        io_write_err("ERROR: Could not find $PWD environment variable\n");
-        status = -1;
-    }
-
-    return status;
+    io_puts(getenv("PWD"));
+    return 0;
 }
 
 static int32_t _losh_exit(char **args) {
     (void)args;
-    exit(EXIT_SUCCESS);  // does not return
+    exit(EXIT_SUCCESS);
 }
 
 static int32_t _echo(char **args) {
